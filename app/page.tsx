@@ -3,7 +3,7 @@ import { useState } from 'react'
 
 const ACTORS: Record<string, string> = {
   google: 'apify~google-search-scraper',
-  linkedin: 'curious_coder~linkedin-profile-scraper',
+  linkedin: 'harvestapi~linkedin-profile-search',
 }
 
 interface Lead {
