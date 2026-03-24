@@ -15,12 +15,12 @@ function buildApifyInput(source: string, input: Record<string, unknown>) {
     }
   }
   if (source === 'linkedin') {
-    return {
-      query: (input.query as string) || 'Amazon FBA brand founder',
-      maxResults: Number(input.maxResults) || 5,
-      scrapeMode: 'Short',
-    }
+  return {
+    keywords: (input.query as string) || 'Amazon FBA brand founder',
+    maxItems: Number(input.maxResults) || 5,
+    scrapeMode: 'Short',
   }
+}
   return input
 }
 
