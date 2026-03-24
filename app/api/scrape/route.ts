@@ -9,12 +9,13 @@ const ACTORS: Record<string, string> = {
 }
 
 function buildApifyInput(source: string, input: Record<string, unknown>) {
-  if (source === 'amazon') {
-    const keyword = (input.searchTerms as string[])?.[0] || 'gun cleaning kit'
-    return {
-      startUrls: [{ url: `https://www.amazon.com/s?k=${encodeURIComponent(keyword)}` }],
-      maxItems: input.maxItemsPerQuery || 10,
-    }
+ if (source === 'amazon') {
+  return {
+    keywords: [(input.searchTerms as string[])?.[0] || 'gun cleaning kit'],
+    maxItems: input.maxItemsPerQuery || 10,
+    country: 'US',
+  }
+}
   }
   return input
 }
