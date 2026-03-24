@@ -15,7 +15,7 @@ function buildApifyInput(source: string, input: Record<string, unknown>) {
     maxItems: input.maxItemsPerQuery || 10,
     country: 'US',
   }
-}
+
   }
   return input
 }
