@@ -2,10 +2,10 @@
 import { useState } from 'react'
 
 const ACTORS: Record<string, string> = {
-  amazon: 'junglee/amazon-crawler',
+  amazon: 'junglee/free-amazon-product-scraper',
   google: 'apify~google-search-scraper',
-  reddit: 'crawlerbros/reddit-scraper',
-  linkedin: 'harvestapi/linkedin-profile-search',
+  reddit: 'trudax/reddit-scraper-lite',
+  linkedin: 'curious_coder/linkedin-profile-scraper',
 }
 
 interface Lead {
