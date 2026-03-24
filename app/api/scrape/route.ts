@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
 
   let rawItems: unknown[] = []
   try {
-    const apifyUrl = `https://api.apify.com/v2/acts/${actorId}/run-sync-get-dataset-items?token=${apifyToken}&timeout=90&memory=512`
+    const apifyUrl = `https://api.apify.com/v2/acts/${actorId}/run-sync-get-dataset-items?token=${apifyToken}&timeout=90&memory=1024`
     const apifyRes = await fetch(apifyUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
