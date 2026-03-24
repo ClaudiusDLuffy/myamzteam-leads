@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 
 const ACTORS: Record<string, string> = {
-  amazon: 'junglee/Amazon-crawler',
+  amazon: 'junglee~Amazon-crawler',
   google: 'apify~google-search-scraper',
   reddit: 'trudax/reddit-scraper-lite',
   linkedin: 'curious_coder/linkedin-profile-scraper',
