@@ -3,7 +3,7 @@ import Anthropic from '@anthropic-ai/sdk'
 
 const ACTORS: Record<string, string> = {
   google: 'apify~google-search-scraper',
-  linkedin: 'harvestapi~linkedin-profile-search',
+'harvestapi~linkedin-profile-search',
 }
 
 function buildApifyInput(source: string, input: Record<string, unknown>) {
@@ -17,8 +17,8 @@ function buildApifyInput(source: string, input: Record<string, unknown>) {
   }
   if (source === 'linkedin') {
   return {
-    queries: (input.query as string) || 'Amazon FBA brand founder',
-    maxItems: Number(input.maxResults) || 5,
+    query: (input.query as string) || 'Amazon FBA brand founder',
+    maxResults: Number(input.maxResults) || 5,
     scrapeMode: 'Short',
   }
 }
