@@ -9,13 +9,12 @@ const ACTORS: Record<string, string> = {
 }
 
 function buildApifyInput(source: string, input: Record<string, unknown>) {
- if (source === 'amazon') {
-  return {
-    keywords: [(input.searchTerms as string[])?.[0] || 'gun cleaning kit'],
-    maxItems: input.maxItemsPerQuery || 10,
-    country: 'US',
-  }
-
+  if (source === 'amazon') {
+    return {
+      keywords: [(input.searchTerms as string[])?.[0] || 'gun cleaning kit'],
+      maxItems: Number(input.maxItemsPerQuery) || 10,
+      country: 'US',
+    }
   }
   return input
 }
@@ -25,7 +24,7 @@ export async function POST(req: NextRequest) {
   const apifyToken = process.env.APIFY_TOKEN
   const anthropicKey = process.env.ANTHROPIC_API_KEY
   if (!apifyToken || !anthropicKey) {
-    return NextResponse.json({ error: 'Missing API keys in environment.' }, { status: 500 })
+    return NextResponse.json({ error: 'Missing API keys.' }, { status: 500 })
   }
   const actorId = ACTORS[source]
   if (!actorId) return NextResponse.json({ error: 'Unknown source' }, { status: 400 })
@@ -48,30 +47,18 @@ export async function POST(req: NextRequest) {
   }
 
   if (!rawItems.length) {
-    return NextResponse.json({ error: 'Apify returned 0 results. Try a different keyword.' }, { status: 404 })
+    return NextResponse.json({ error: 'Apify returned 0 results.' }, { status: 404 })
   }
 
   const client = new Anthropic({ apiKey: anthropicKey })
-  const prompt = `You are the MYAMZTEAM Lead Qualification Agent for an Amazon FBA management agency.
+  const prompt = `You are the MYAMZTEAM Lead Qualification Agent for an Amazon FBA agency.
 
-MYAMZTEAM Ideal Client Profile (ICP):
-- Amazon brand doing $500K–$10M/yr revenue
-- Founder/operator overwhelmed, DIY-ing their account
-- Listing issues: weak images, thin copy, low reviews, no A+ content
-- No current full-service Amazon agency
-- FBA-first, US marketplace primary
+ICP: Amazon brand $500K-$10M/yr, overwhelmed founder, weak listings, no full-service agency, FBA-first US.
 
-RAW SCRAPED DATA from ${source} (actor: ${actorId}):
+RAW DATA from ${source}:
 ${JSON.stringify(rawItems.slice(0, 12), null, 2)}
 
-Qualify each item. Return ONLY a raw JSON array. Each object:
-- name: string
-- score: number 1-10
-- verdict: "Qualified" | "Maybe" | "Disqualified"
-- pain: string (one specific pain point)
-- outreach: string (1-2 sentence cold opener)
-- action: "Email" | "LinkedIn DM" | "Skip"
-- source: "${source}"`
+Return ONLY a raw JSON array. Each object: name, score (1-10), verdict ("Qualified"|"Maybe"|"Disqualified"), pain, outreach, action ("Email"|"LinkedIn DM"|"Skip"), source ("${source}")`
 
   try {
     const msg = await client.messages.create({
@@ -81,9 +68,8 @@ Qualify each item. Return ONLY a raw JSON array. Each object:
     })
     const text = msg.content.filter(b => b.type === 'text').map(b => (b as { text: string }).text).join('')
     const match = text.match(/\[[\s\S]*\]/)
-    if (!match) throw new Error('No JSON array in Claude response')
-    const leads = JSON.parse(match[0])
-    return NextResponse.json({ leads, raw: rawItems.length })
+    if (!match) throw new Error('No JSON in response')
+    return NextResponse.json({ leads: JSON.parse(match[0]), raw: rawItems.length })
   } catch (e: unknown) {
     return NextResponse.json({ error: 'Claude error: ' + String(e) }, { status: 500 })
   }
