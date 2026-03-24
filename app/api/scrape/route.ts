@@ -14,9 +14,9 @@ function buildApifyInput(source: string, input: Record<string, unknown>) {
       maxPagesPerQuery: 1,
     }
   }
-  if (source === 'linkedin') {
+ if (source === 'linkedin') {
   return {
-    keywords: (input.query as string) || 'Amazon FBA brand founder',
+    keywords: [(input.query as string) || 'Amazon FBA brand founder'],
     maxItems: Number(input.maxResults) || 5,
     scrapeMode: 'Short',
   }
