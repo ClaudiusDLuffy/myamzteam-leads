@@ -3,25 +3,24 @@ import Anthropic from '@anthropic-ai/sdk'
 
 const ACTORS: Record<string, string> = {
   google: 'apify~google-search-scraper',
-'harvestapi~linkedin-profile-search',
+  linkedin: 'harvestapi~linkedin-profile-search',
 }
 
 function buildApifyInput(source: string, input: Record<string, unknown>) {
   if (source === 'google') {
-    const query = (input.query as string) || 'Amazon FBA brand founder overwhelmed agency'
     return {
-      queries: query,
+      queries: (input.query as string) || 'Amazon FBA brand founder struggling',
       resultsPerPage: Number(input.maxResults) || 10,
       maxPagesPerQuery: 1,
     }
   }
   if (source === 'linkedin') {
-  return {
-    query: (input.query as string) || 'Amazon FBA brand founder',
-    maxResults: Number(input.maxResults) || 5,
-    scrapeMode: 'Short',
+    return {
+      query: (input.query as string) || 'Amazon FBA brand founder',
+      maxResults: Number(input.maxResults) || 5,
+      scrapeMode: 'Short',
+    }
   }
-}
   return input
 }
 
