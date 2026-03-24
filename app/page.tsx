@@ -2,7 +2,7 @@
 import { useState } from 'react'
 
 const ACTORS: Record<string, string> = {
-  amazon: 'junglee/free-amazon-product-scraper',
+  amazon: 'junglee/Amazon-crawler',
   google: 'apify~google-search-scraper',
   reddit: 'trudax/reddit-scraper-lite',
   linkedin: 'curious_coder/linkedin-profile-scraper',
