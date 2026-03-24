@@ -12,8 +12,8 @@ function buildApifyInput(source: string, input: Record<string, unknown>) {
   if (source === 'amazon') {
     const keyword = (input.searchTerms as string[])?.[0] || 'gun cleaning kit'
     return {
-      startUrls: [{ url: `https://www.amazon.com/s?k=${encodeURIComponent(keyword)}` }],
-      maxItems: Number(input.maxItemsPerQuery) || 10,
+      categoryOrProductUrls: [{ url: `https://www.amazon.com/s?k=${encodeURIComponent(keyword)}` }],
+      maxItemsPerPage: Number(input.maxItemsPerQuery) || 10,
     }
   }
   return input
