@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 
 const ACTORS: Record<string, string> = {
-  amazon: 'apify~amazon-product-scraper',
+  amazon: 'junglee/Amazon-crawler',
   google: 'apify~google-search-scraper',
   reddit: 'trudax/reddit-scraper-lite',
   linkedin: 'curious_coder/linkedin-profile-scraper',
@@ -10,10 +10,10 @@ const ACTORS: Record<string, string> = {
 
 function buildApifyInput(source: string, input: Record<string, unknown>) {
   if (source === 'amazon') {
+    const keyword = (input.searchTerms as string[])?.[0] || 'gun cleaning kit'
     return {
-      keywords: [(input.searchTerms as string[])?.[0] || 'gun cleaning kit'],
+      startUrls: [{ url: `https://www.amazon.com/s?k=${encodeURIComponent(keyword)}` }],
       maxItems: Number(input.maxItemsPerQuery) || 10,
-      country: 'US',
     }
   }
   return input
