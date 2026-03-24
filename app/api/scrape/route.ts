@@ -2,20 +2,26 @@ import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 
 const ACTORS: Record<string, string> = {
-  amazon: 'junglee~Amazon-crawler',
   google: 'apify~google-search-scraper',
-  reddit: 'trudax/reddit-scraper-lite',
-  linkedin: 'curious_coder/linkedin-profile-scraper',
+  linkedin: 'curious_coder~linkedin-profile-scraper',
 }
 
 function buildApifyInput(source: string, input: Record<string, unknown>) {
-  if (source === 'amazon') {
-  const keyword = (input.searchTerms as string[])?.[0] || 'gun cleaning kit'
-  return {
-    categoryOrProductUrls: [{ url: `https://www.amazon.com/s?k=${encodeURIComponent(keyword)}` }],
-    maxItemsPerPage: 5,
+  if (source === 'google') {
+    const query = (input.query as string) || 'Amazon FBA brand founder overwhelmed agency'
+    return {
+      queries: query,
+      resultsPerPage: Number(input.maxResults) || 10,
+      maxPagesPerQuery: 1,
+    }
   }
-}
+  if (source === 'linkedin') {
+    return {
+      profileUrls: [],
+      searchQuery: (input.query as string) || 'Amazon FBA brand founder',
+      maxResults: Number(input.maxResults) || 5,
+    }
+  }
   return input
 }
 
@@ -31,7 +37,7 @@ export async function POST(req: NextRequest) {
 
   let rawItems: unknown[] = []
   try {
-    const apifyUrl = `https://api.apify.com/v2/acts/${actorId}/run-sync-get-dataset-items?token=${apifyToken}&timeout=180&memory=1024`
+    const apifyUrl = `https://api.apify.com/v2/acts/${actorId}/run-sync-get-dataset-items?token=${apifyToken}&timeout=60&memory=1024`
     const apifyRes = await fetch(apifyUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -47,18 +53,33 @@ export async function POST(req: NextRequest) {
   }
 
   if (!rawItems.length) {
-    return NextResponse.json({ error: 'Apify returned 0 results.' }, { status: 404 })
+    return NextResponse.json({ error: 'No results returned. Try a different query.' }, { status: 404 })
   }
 
   const client = new Anthropic({ apiKey: anthropicKey })
-  const prompt = `You are the MYAMZTEAM Lead Qualification Agent for an Amazon FBA agency.
+  const prompt = `You are the MYAMZTEAM Lead Qualification Agent for an Amazon FBA management agency.
 
-ICP: Amazon brand $500K-$10M/yr, overwhelmed founder, weak listings, no full-service agency, FBA-first US.
+MYAMZTEAM ICP:
+- Amazon brand doing $500K–$10M/yr
+- Founder/operator overwhelmed, DIY-ing their account
+- Listing quality issues (weak images, thin copy, low reviews, no A+)
+- No current full-service Amazon agency
+- FBA-first, US marketplace primary
 
-RAW DATA from ${source}:
+RAW DATA from ${source} scrape:
 ${JSON.stringify(rawItems.slice(0, 12), null, 2)}
 
-Return ONLY a raw JSON array. Each object: name, score (1-10), verdict ("Qualified"|"Maybe"|"Disqualified"), pain, outreach, action ("Email"|"LinkedIn DM"|"Skip"), source ("${source}")`
+Analyze each result. Extract any contact info (name, email, LinkedIn URL, website). Qualify against ICP.
+
+Return ONLY a raw JSON array. Each object:
+- name: string (brand or person name)
+- contact: string (email, LinkedIn URL, or website if found — otherwise "Not found")
+- score: number 1-10 (ICP fit)
+- verdict: "Qualified" | "Maybe" | "Disqualified"
+- pain: string (one specific pain point you spotted)
+- outreach: string (1-2 sentence personalized cold opener referencing something specific)
+- action: "Email" | "LinkedIn DM" | "Skip"
+- source: "${source}"`
 
   try {
     const msg = await client.messages.create({
