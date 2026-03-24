@@ -10,12 +10,12 @@ const ACTORS: Record<string, string> = {
 
 function buildApifyInput(source: string, input: Record<string, unknown>) {
   if (source === 'amazon') {
-    const keyword = (input.searchTerms as string[])?.[0] || 'gun cleaning kit'
-    return {
-      categoryOrProductUrls: [{ url: `https://www.amazon.com/s?k=${encodeURIComponent(keyword)}` }],
-      maxItemsPerPage: Number(input.maxItemsPerQuery) || 10,
-    }
+  const keyword = (input.searchTerms as string[])?.[0] || 'gun cleaning kit'
+  return {
+    categoryOrProductUrls: [{ url: `https://www.amazon.com/s?k=${encodeURIComponent(keyword)}` }],
+    maxItemsPerPage: 5,
   }
+}
   return input
 }
 
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
 
   let rawItems: unknown[] = []
   try {
-    const apifyUrl = `https://api.apify.com/v2/acts/${actorId}/run-sync-get-dataset-items?token=${apifyToken}&timeout=90&memory=1024`
+    const apifyUrl = `https://api.apify.com/v2/acts/${actorId}/run-sync-get-dataset-items?token=${apifyToken}&timeout=180&memory=1024`
     const apifyRes = await fetch(apifyUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
