@@ -10,10 +10,10 @@ const ACTORS: Record<string, string> = {
 
 function buildApifyInput(source: string, input: Record<string, unknown>) {
   if (source === 'amazon') {
+    const keyword = (input.searchTerms as string[])?.[0] || 'gun cleaning kit'
     return {
-      search: (input.searchTerms as string[])?.[0] || 'gun cleaning kit',
+      startUrls: [{ url: `https://www.amazon.com/s?k=${encodeURIComponent(keyword)}` }],
       maxItems: input.maxItemsPerQuery || 10,
-      country: 'US',
     }
   }
   return input
